@@ -30,6 +30,8 @@ const colorFunctionStart = /^\s*(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/;
 
 const shouldSetDefaultColor = !location.hostname.startsWith('www.ebay.') && !location.hostname.includes('.ebay.');
 
+const cssWideKeywords = new Set(['', 'initial', 'inherit', 'unset', 'revert', 'revert-layer']);
+
 export class VariablesStore {
     private varTypes = new Map<string, number>();
     private rulesQueue = new Set<CSSRuleList | CSSRule[]>();
@@ -455,6 +457,9 @@ export class VariablesStore {
 
     private inspectVariable(varName: string, value: string) {
         this.unstableVarValues.set(varName, value);
+        if (cssWideKeywords.has(value.trim().toLowerCase())) {
+            return;
+        }
 
         const hasVar = isVarDependant(value);
         if (hasVar && isConstructedColorVar(value)) {

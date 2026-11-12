@@ -65,6 +65,12 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 
 .panel { background: #fff; padding: 6px; }
 .panel input { background: rgba(0, 0, 0, .05); border: 0; padding: 6px; }
+
+:root { --glass: initial; }
+:root { --glass: rgba(255, 255, 255, .9); }
+[data-never] { --glass: rgba(15, 15, 15, .8); }
+.glass-reset { --glass: unset; }
+.glass { background: var(--glass); }
 </style>
 </head>
 <body>
@@ -78,6 +84,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 <div class="row"><b>relative colour</b><div class="box relative-bg"></div></div>
 <div class="row"><b>fade with var() stop</b><div class="box fade-var"></div><div class="box fade-fallback"></div></div>
 <div class="row link-nested"><b>link via nested var()</b><a href="#x">a link</a></div>
+<div class="row"><b>frosted bar var redefined</b><div class="box glass"></div><span class="glass-reset"></span></div>
 <div class="row"><b>translucent hairline border</b><div class="box hairline"></div><div class="box hairline-logical"></div></div>
 <div class="row"><b>light-dark toggle vars</b><div class="box toggle-border"></div><div class="box toggle-bg"></div></div>
 <div class="row"><b>background var with image</b><div class="box btn-shorthand"></div><div class="box btn-imported"></div></div>

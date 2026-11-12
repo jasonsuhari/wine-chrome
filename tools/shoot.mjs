@@ -3,9 +3,9 @@ import { mkdirSync, rmSync } from 'node:fs'
 import path from 'node:path'
 
 const HERE = path.dirname(new URL(import.meta.url).pathname)
-const EXT = path.resolve(HERE, '../dist/wine')
+const EXT = path.resolve(HERE, process.env.EXT || '../dist/wine')
 const OUT = path.resolve(HERE, process.env.OUT || 'out/shots')
-const PROFILE = path.resolve(HERE, '.profile')
+const PROFILE = path.resolve(HERE, process.env.PROFILE || '.profile')
 const exe = process.env.CHROME_PATH || chromium.executablePath()
 export const SITES = {
   wikipedia: 'https://en.wikipedia.org/wiki/Wine',
@@ -20,6 +20,18 @@ export const SITES = {
   apple: 'https://www.apple.com/',
   stripe: 'https://stripe.com/',
   notion: 'https://www.notion.com/',
+  ghpr: 'https://github.com/darkreader/darkreader/pull/13000/files',
+  so: 'https://stackoverflow.com/questions/927358/how-do-i-undo-the-most-recent-local-commits-in-git',
+  medium: 'https://karpathy.medium.com/software-2-0-a64152b37c35',
+  substack: 'https://www.astralcodexten.com/p/heuristics-that-almost-always-work',
+  nyt: 'https://www.nytimes.com/',
+  verge: 'https://www.theverge.com/',
+  reddit: 'https://www.reddit.com/r/programming/',
+  supabase: 'https://supabase.com/',
+  spotify: 'https://open.spotify.com/',
+  linear: 'https://linear.app/',
+  chatgpt: 'https://chatgpt.com/',
+  google: 'https://www.google.com/search?q=burgundy+wine+region&hl=en',
 }
 const pick = (process.env.SITES || Object.keys(SITES).join(',')).split(',')
 mkdirSync(OUT, { recursive: true })

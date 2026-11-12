@@ -59,6 +59,10 @@ const CASES = {
     const all = [...stops('.fade-var'), ...stops('.fade-fallback')].filter((c) => c.a > 0.05);
     return [all.length > 0 && all.every((c) => hsl(c).l < 0.35), all.map(fmt).join(' ') || style('.fade-var', 'background-image')];
   },
+  'frosted bar through a redefined var() is dark'() {
+    const c = color('.glass', 'background-color');
+    return [hsl(c).l < 0.35, fmt(c)];
+  },
   'link through nested var() is light'() {
     const c = color('.link-nested a', 'color');
     return [hsl(c).l > 0.6, fmt(c)];
