@@ -1,0 +1,9 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{height:100%;background:#12060a;font-family:-apple-system,"SF Pro Display","Helvetica Neue",sans-serif;overflow:hidden}
+.ntp{position:relative;width:100%;height:100%;background:rgb(32,9,15)}
+.fx{position:absolute;inset:0}
+.over{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;pointer-events:none}
+.search{pointer-events:auto;width:560px;max-width:80vw}
+.search input{width:100%;height:50px;border-radius:25px;border:1px solid rgba(255,255,255,.14);background:rgba(28,8,13,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:#f6e9ec;font-size:15px;padding:0 22px;outline:none}
+.search input::placeholder{color:#d9b4bd}
+.engraved{width:600px;height:170px;font-family:"Avenir Next","SF Pro Display",-apple-system,sans-serif;font-weight:600;font-size:132px;letter-spacing:-2px;user-select:none}

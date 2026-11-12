@@ -1,0 +1,9 @@
+node_modules/
+dist/
+engine/build/
+engine/darkreader.js
+engine/darkreader.mjs
+newtab/dist/
+tools/.profile/
+tools/out/
+.DS_Store

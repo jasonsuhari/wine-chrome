@@ -1,0 +1,7 @@
+{ "manifest_version": 3, "name": "Gloss Red", "version": "1.0",
+  "theme": { "colors": {
+    "frame": [58,18,28], "frame_inactive": [46,14,22], "frame_incognito": [30,8,14],
+    "toolbar": [106,31,46], "toolbar_text": [246,233,236], "toolbar_button_icon": [246,233,236],
+    "tab_text": [246,233,236], "tab_background_text": [217,180,189], "tab_background_text_inactive": [190,150,160],
+    "bookmark_text": [246,233,236], "omnibox_background": [74,21,32], "omnibox_text": [246,233,236],
+    "ntp_background": [26,7,12], "ntp_text": [246,233,236], "ntp_link": [217,180,189] } } }
