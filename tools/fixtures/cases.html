@@ -12,6 +12,10 @@
   --p3-channels: .933 .933 .933;
   --p3-built: color(display-p3 var(--p3-channels));
   --hairline: #0000001a;
+  --surface-l: .97;
+  --surface-hue: calc(150 + 100);
+  --surface-bg: oklch(var(--surface-l) calc(.02 * .5) var(--surface-hue));
+  --surface-card: oklch(from var(--surface-bg) calc(l + .02) c h);
   --brand-h: 27;
   --brand-s: 90%;
   --brand-l: 48%;
@@ -35,6 +39,8 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 .warm-grey { background: #f4f2ee; } .slate { background: #38434f; } .cool-grey { background: #cedeee; } .pale-blue { background: #f8fafd; }
 
 .oklch-bg { background: oklch(0.97 0.01 250); }
+.oklch-var-bg { background: var(--surface-bg); }
+.oklch-from-var { background-color: var(--surface-card); }
 .calc-hsl { color: hsl(calc(20 + 7) 90% 45%); }
 .calc-hsl-var { background-color: hsl(var(--brand-h), var(--brand-s), calc(var(--brand-l) + ((100% - var(--brand-l)) * .9))); }
 .ld-bg { background: var(--ld-bg); }
@@ -66,7 +72,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 
 <div class="row"><b>dark surfaces keep order</b><div class="box dark-0"></div><div class="box dark-1"></div><div class="box dark-2"></div><div class="box dark-3"></div></div>
 <div class="row"><b>neutral greys become wine</b><div class="box warm-grey"></div><div class="box slate"></div><div class="box cool-grey"></div><div class="box pale-blue"></div></div>
-<div class="row"><b>oklch background</b><div class="box oklch-bg"></div></div>
+<div class="row"><b>oklch background</b><div class="box oklch-bg"></div><div class="box oklch-var-bg"></div><div class="box oklch-from-var"></div></div>
 <div class="row"><b>hsl with calc keeps orange</b><span class="calc-hsl">orange text</span><div class="box calc-hsl-var"></div></div>
 <div class="row"><b>light-dark() surfaces</b><div class="box ld-bg"></div><div class="box ld-card"></div></div>
 <div class="row"><b>relative colour</b><div class="box relative-bg"></div></div>

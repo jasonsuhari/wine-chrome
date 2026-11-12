@@ -37,8 +37,8 @@ const CASES = {
     return [cs.every(isWineHue), cs.map(fmt).join(' ')];
   },
   'oklch background becomes dark wine'() {
-    const c = color('.oklch-bg', 'background-color');
-    return [hsl(c).l < 0.3 && isWineHue(c), fmt(c)];
+    const cs = ['.oklch-bg', '.oklch-var-bg', '.oklch-from-var'].map((s) => color(s, 'background-color'));
+    return [cs.every((c) => hsl(c).l < 0.3 && isWineHue(c)), cs.map(fmt).join(' ')];
   },
   'hsl() with calc() keeps its hue'() {
     const c = color('.calc-hsl', 'color');
