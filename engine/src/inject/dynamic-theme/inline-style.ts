@@ -620,7 +620,7 @@ export function overrideInlineStyle(element: HTMLElement, theme: Theme, ignoreIn
                             const {width, height} = element.getBoundingClientRect();
                             isBg = (width > SMALL_SVG_THRESHOLD || height > SMALL_SVG_THRESHOLD);
                         }
-                        overrideValue('fill', '', 'fill', isBg ? 'background-color' : 'color', value, value);
+                        overrideValue('fill', '', 'fill', isBg ? 'background-color' : 'fill', value, value);
                     };
 
                     if (isReadyStateComplete()) {
@@ -641,7 +641,7 @@ export function overrideInlineStyle(element: HTMLElement, theme: Theme, ignoreIn
 
     if (element.hasAttribute('stroke')) {
         const value = element.getAttribute('stroke')!;
-        const cssProp = element instanceof SVGLineElement || element instanceof SVGTextElement ? 'border-color' : 'color';
+        const cssProp = element instanceof SVGLineElement || element instanceof SVGTextElement ? 'border-color' : 'stroke';
         overrideValue('stroke', '', 'stroke', cssProp, value, value);
     }
 

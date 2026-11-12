@@ -13,7 +13,7 @@ import {logWarn, logInfo} from '../utils/log';
 import {cssURLRegex, getCSSURLValue, getCSSBaseBath, getRuleMediaText} from './css-rules';
 import type {ImageDetails} from './image';
 import {getImageDetails, getFilteredImageURL, getSolidColorImageURL, cleanImageProcessingCache, requestBlobURLCheck, isBlobURLCheckResultReady, tryConvertDataURLToBlobURL} from './image';
-import {modifyBackgroundColor, modifyBorderColor, modifyForegroundColor, modifyGradientColor, modifyShadowColor, clearColorModificationCache} from './modify-colors';
+import {modifyBackgroundColor, modifyIconColor, modifyBorderColor, modifyForegroundColor, modifyGradientColor, modifyShadowColor, clearColorModificationCache} from './modify-colors';
 import {getSheetScope} from './style-scope';
 import type {CSSVariableModifier, VariablesStore} from './variables';
 
@@ -162,6 +162,9 @@ export function getModifiedUserAgentStyle(theme: Theme, isIFrame: boolean, style
     lines.push('a {');
     lines.push(`    color: ${modifyForegroundColor({r: 0, g: 64, b: 255}, theme)};`);
     lines.push('}');
+    lines.push('html {');
+    lines.push('    fill: currentcolor;');
+    lines.push('}');
     lines.push('table {');
     lines.push(`    border-color: ${modifyBorderColor({r: 128, g: 128, b: 128}, theme)};`);
     lines.push('}');
@@ -232,13 +235,15 @@ function getModifiedScrollbarStyle(theme: Theme) {
     } else {
         const rgb = parseColorWithCache(theme.scrollbarColor)!;
         const hsl = rgbToHSL(rgb);
-        const darken = (darker: number) => ({...hsl, l: clamp(hsl.l - darker, 0, 1)});
-        colorTrack = hslToString(darken(0.4));
+        colorTrack = modifyBackgroundColor({r: 255, g: 255, b: 255}, theme);
         colorThumb = hslToString(hsl);
     }
     return [
-        `* {`,
+        `html {`,
         `    scrollbar-color: ${colorThumb} ${colorTrack};`,
+        `}`,
+        `body * {`,
+        `    scrollbar-color: auto;`,
         `}`,
     ].join('\n');
 }
@@ -338,6 +343,9 @@ function getColorModifier(prop: string, value: string, rule: CSSStyleRule): stri
     }
     if (prop.includes('border') || prop.includes('outline')) {
         return (theme) => modifyBorderColor(rgb, theme);
+    }
+    if (prop === 'fill' || prop === 'stroke') {
+        return (theme) => modifyIconColor(rgb, theme);
     }
     return (theme) => modifyForegroundColor(rgb, theme);
 }

@@ -4,7 +4,7 @@ import {ThemeEngine} from './generators/theme-engines';
 import {WINE_ENGINE} from './inject/dynamic-theme/wine-engine';
 import {AutomationMode} from './utils/automation';
 import type {ParsedColorSchemeConfig} from './utils/colorscheme-parser';
-import {isMacOS, isWindows, isCSSColorSchemePropSupported, isEdge, isMobile} from './utils/platform';
+import {isMacOS, isWindows, isEdge, isMobile} from './utils/platform';
 
 declare const __CHROMIUM_MV3__: boolean;
 declare const __PLUS__: boolean;
@@ -37,7 +37,7 @@ export const DEFAULT_THEME: Theme = {
     lightSchemeTextColor: DEFAULT_COLORS.lightScheme.text,
     scrollbarColor: WINE_ENGINE.scrollbar,
     selectionColor: WINE_ENGINE.selection,
-    styleSystemControls: __CHROMIUM_MV3__ ? false : !isCSSColorSchemePropSupported,
+    styleSystemControls: true,
     lightColorScheme: 'Default',
     darkColorScheme: 'Default',
     immediateModify: false,

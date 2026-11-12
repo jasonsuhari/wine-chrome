@@ -171,10 +171,22 @@ function surfaceLightness(l: number, pole: HSLA): number {
 const DARK_PAGE_LIGHTNESS = 0.14;
 
 function darkSurfaceLightness(l: number, pole: HSLA): number {
+    const raised = pole.l + WINE_ENGINE.raisedStep * 0.6;
     if (l <= DARK_PAGE_LIGHTNESS) {
-        return scale(l, 0, DARK_PAGE_LIGHTNESS, pole.l * 0.55, pole.l);
+        return scale(l, 0, DARK_PAGE_LIGHTNESS, pole.l, raised);
     }
-    return scale(l, DARK_PAGE_LIGHTNESS, 0.5, pole.l + WINE_ENGINE.raisedStep * 0.6, MAX_BG_LIGHTNESS);
+    return scale(l, DARK_PAGE_LIGHTNESS, 0.5, raised, MAX_BG_LIGHTNESS);
+}
+
+function chroma(s: number, l: number): number {
+    return s * (1 - Math.abs(2 * l - 1));
+}
+
+const NEUTRAL_CHROMA = 0.12;
+const SHADING_MAX_ALPHA = 0.25;
+
+function isShadingOverlay(l: number, a: number, isNeutral: boolean): boolean {
+    return isNeutral && a < 1 && a <= SHADING_MAX_ALPHA && l < 0.3;
 }
 
 function wineSurface(l: number, pole: HSLA, a: HSLA['a']): HSLA {
@@ -185,7 +197,10 @@ function wineSurface(l: number, pole: HSLA, a: HSLA['a']): HSLA {
 function modifyBgHSL({h, s, l, a}: HSLA, pole: HSLA): HSLA {
     const isDark = l < 0.5;
     const isBlue = h > 200 && h < 280;
-    const isNeutral = s < 0.12 || (l > 0.8 && isBlue) || (l < 0.25 && s < 0.35);
+    const isNeutral = chroma(s, l) < NEUTRAL_CHROMA || (l > 0.8 && isBlue);
+    if (isShadingOverlay(l, a ?? 1, isNeutral)) {
+        return {h: pole.h, s: 0.3, l: 0.9, a};
+    }
     if (isDark) {
         const lx = darkSurfaceLightness(l, pole);
         if (isNeutral) {
@@ -254,27 +269,25 @@ function isLinkText(h: number, s: number): boolean {
     return s >= 0.12 && h >= 185 && h <= 290;
 }
 
-function modifyFgHSL({h, s, l, a}: HSLA, pole: HSLA): HSLA {
-    if (isLinkText(h, s)) {
-        return {h: pole.h, s: pole.s, l: pole.l, a};
+function modifyFgHSL(hsl: HSLA, pole: HSLA): HSLA {
+    if (isLinkText(hsl.h, hsl.s)) {
+        return {h: pole.h, s: pole.s, l: pole.l, a: hsl.a};
     }
+    return mapForeground(hsl, pole, clampAccentText);
+}
+
+function modifyIconHSL(hsl: HSLA, pole: HSLA): HSLA {
+    return mapForeground(hsl, pole, (accent) => accent);
+}
+
+function mapForeground({h, s, l, a}: HSLA, pole: HSLA, finishAccent: (hsl: HSLA) => HSLA): HSLA {
     const isLight = l > 0.5;
     const isNeutral = l < 0.2 || s < 0.24;
-    if (isLight) {
-        const lx = scale(l, 0.5, 1, MIN_FG_LIGHTNESS, pole.l);
-        if (isNeutral) {
-            return {h: pole.h, s: pole.s, l: lx, a};
-        }
-        return clampAccentText({h: toWineHue(h, s), s, l: lx, a});
-    }
-
+    const lx = isLight ? scale(l, 0.5, 1, MIN_FG_LIGHTNESS, pole.l) : scale(l, 0, 0.5, pole.l, MIN_FG_LIGHTNESS);
     if (isNeutral) {
-        const lx = scale(l, 0, 0.5, pole.l, MIN_FG_LIGHTNESS);
         return {h: pole.h, s: pole.s, l: lx, a};
     }
-
-    const lx = scale(l, 0, 0.5, pole.l, MIN_FG_LIGHTNESS);
-    return clampAccentText({h: toWineHue(h, s), s, l: lx, a});
+    return finishAccent({h: toWineHue(h, s), s, l: lx, a});
 }
 
 function _modifyForegroundColor(rgb: RGBA, theme: Theme) {
@@ -298,6 +311,13 @@ export function modifyForegroundColor(rgb: RGBA, theme: Theme, shouldRegisterCol
         return _modifyForegroundColor(rgb, theme);
     }
     return modifyAndRegisterColor('text', rgb, theme, _modifyForegroundColor);
+}
+
+export function modifyIconColor(rgb: RGBA, theme: Theme): string {
+    if (theme.mode === 0 || __PLUS__) {
+        return _modifyForegroundColor(rgb, theme);
+    }
+    return modifyColorWithCache(rgb, theme, modifyIconHSL, getFgPole(theme));
 }
 
 function modifyBorderHSL({h, s, l, a}: HSLA, _poleFg: HSLA, poleBg: HSLA): HSLA {
