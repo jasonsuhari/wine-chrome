@@ -1,5 +1,4 @@
 import {evalMath} from './math-eval';
-import {isSystemDarkModeEnabled} from './media-query';
 import {getParenthesesRange} from './text';
 
 export interface RGBA {
@@ -206,14 +205,25 @@ export function parse($color: string): RGBA | null {
     }
 
     if (c.startsWith('light-dark(') && c.endsWith(')')) {
-        // light-dark([color()], [color()])
-        const match = c.match(/^light-dark\(\s*([a-z]+(\(.*\))?),\s*([a-z]+(\(.*\))?)\s*\)$/);
-        if (match) {
-            const schemeColor = isSystemDarkModeEnabled() ? match[3] : match[1];
-            return parse(schemeColor);
-        }
+        const lightColor = getFirstArgument(c.slice('light-dark('.length, -1));
+        return lightColor ? parse(lightColor) : null;
     }
 
+    return null;
+}
+
+function getFirstArgument(args: string): string | null {
+    let depth = 0;
+    for (let i = 0; i < args.length; i++) {
+        const char = args[i];
+        if (char === '(') {
+            depth++;
+        } else if (char === ')') {
+            depth--;
+        } else if (char === ',' && depth === 0) {
+            return args.slice(0, i);
+        }
+    }
     return null;
 }
 
