@@ -88,8 +88,7 @@ const shorthandVarDepPropRegexps = isSafari ? shorthandVarDependantProperties.ma
     return [prop, regexp] as [string, RegExp];
 }) : null;
 
-export function iterateCSSDeclarations(style: CSSStyleDeclaration, iterate: (property: string, value: string) => void): void {
-    const cssText = style.cssText;
+export function iterateCSSDeclarations(style: CSSStyleDeclaration, iterate: (property: string, value: string) => void, cssText = style.cssText): void {
     if (cssText.includes('var(')) {
         if (isSafari) {
             // Safari doesn't show shorthand properties' values

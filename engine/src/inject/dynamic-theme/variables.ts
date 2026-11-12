@@ -427,6 +427,10 @@ export class VariablesStore {
     }
 
     private collectVarsFromCSSDeclarations(style: CSSStyleDeclaration) {
+        const cssText = style.cssText;
+        if (!mayHaveVariables(cssText)) {
+            return;
+        }
         iterateCSSDeclarations(style, (property, value) => {
             if (isVariable(property)) {
                 this.inspectVariable(property, value);
@@ -434,7 +438,7 @@ export class VariablesStore {
             if (isVarDependant(value)) {
                 this.inspectVarDependant(property, value);
             }
-        });
+        }, cssText);
     }
 
     private shouldProcessRootVariables() {
@@ -798,6 +802,10 @@ function wrapBorderColorVariableName(name: string) {
 
 function wrapBgImgVariableName(name: string) {
     return `--darkreader-bgimg${name}`;
+}
+
+function mayHaveVariables(cssText: string) {
+    return cssText.includes('--') || cssText.includes(': ;');
 }
 
 function isVariable(property: string) {
