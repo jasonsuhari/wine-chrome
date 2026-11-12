@@ -12,6 +12,9 @@
   --p3-channels: .933 .933 .933;
   --p3-built: color(display-p3 var(--p3-channels));
   --hairline: #0000001a;
+  --brand-h: 27;
+  --brand-s: 90%;
+  --brand-l: 48%;
   --x-white: #ffffff;
   --accent: #0b57d0;
   --btn: #f57224 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='5' cy='5' r='4' fill='%23fff'/%3E%3C/svg%3E") center no-repeat;
@@ -33,6 +36,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 
 .oklch-bg { background: oklch(0.97 0.01 250); }
 .calc-hsl { color: hsl(calc(20 + 7) 90% 45%); }
+.calc-hsl-var { background-color: hsl(var(--brand-h), var(--brand-s), calc(var(--brand-l) + ((100% - var(--brand-l)) * .9))); }
 .ld-bg { background: var(--ld-bg); }
 .ld-card { background-color: var(--ld-card); }
 .relative-bg { background: rgb(from #ffffff r g b / 90%); }
@@ -63,7 +67,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 <div class="row"><b>dark surfaces keep order</b><div class="box dark-0"></div><div class="box dark-1"></div><div class="box dark-2"></div><div class="box dark-3"></div></div>
 <div class="row"><b>neutral greys become wine</b><div class="box warm-grey"></div><div class="box slate"></div><div class="box cool-grey"></div><div class="box pale-blue"></div></div>
 <div class="row"><b>oklch background</b><div class="box oklch-bg"></div></div>
-<div class="row"><b>hsl with calc keeps orange</b><span class="calc-hsl">orange text</span></div>
+<div class="row"><b>hsl with calc keeps orange</b><span class="calc-hsl">orange text</span><div class="box calc-hsl-var"></div></div>
 <div class="row"><b>light-dark() surfaces</b><div class="box ld-bg"></div><div class="box ld-card"></div></div>
 <div class="row"><b>relative colour</b><div class="box relative-bg"></div></div>
 <div class="row"><b>fade with var() stop</b><div class="box fade-var"></div><div class="box fade-fallback"></div></div>

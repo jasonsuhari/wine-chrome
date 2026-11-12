@@ -24,10 +24,12 @@ export function parseColorWithCache($color: string): RGBA | null {
     if (rgbaParseCache.has(key)) {
         return rgbaParseCache.get(key)!;
     }
+    let color: RGBA | null;
     if ($color.includes('calc(')) {
-        $color = lowerCalcExpression($color);
+        color = parse(lowerCalcExpression($color)) ?? parseWithBrowser($color);
+    } else {
+        color = parse($color);
     }
-    const color = parse($color);
     rgbaParseCache.set(key, color);
     return color;
 }
@@ -683,6 +685,13 @@ export function getSRGBLightness(r: number, g: number, b: number): number {
 
 let canvas: HTMLCanvasElement;
 let context: CanvasRenderingContext2D;
+
+function parseWithBrowser($color: string): RGBA | null {
+    if (typeof CSS === 'undefined' || !CSS.supports('color', $color)) {
+        return null;
+    }
+    return domParseColor($color);
+}
 
 function domParseColor($color: string) {
     if (!context) {

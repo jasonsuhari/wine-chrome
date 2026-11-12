@@ -42,8 +42,10 @@ const CASES = {
   },
   'hsl() with calc() keeps its hue'() {
     const c = color('.calc-hsl', 'color');
+    const bg = color('.calc-hsl-var', 'background-color');
     const {h} = hsl(c);
-    return [h >= 5 && h <= 60, `${fmt(c)} h=${h.toFixed(0)}`];
+    const bgHsl = hsl(bg);
+    return [h >= 5 && h <= 60 && bgHsl.h >= 5 && bgHsl.h <= 60 && bgHsl.l < 0.35, `${fmt(c)} h=${h.toFixed(0)} bg=${fmt(bg)} h=${bgHsl.h.toFixed(0)}`];
   },
   'light-dark() surfaces become wine'() {
     const cs = ['.ld-bg', '.ld-card'].map((s) => color(s, 'background-color'));
