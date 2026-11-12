@@ -451,6 +451,12 @@ export function getBgImageModifier(
                 .concat(getIndices(urls).map((i) => ({type: 'url', offset: 0, ...i})))
                 .sort((a, b) => a.index > b.index ? 1 : -1);
 
+        const isClippedToText = (
+            rule.style.getPropertyValue('background-clip') === 'text' ||
+            rule.style.getPropertyValue('-webkit-background-clip') === 'text'
+        );
+        const modifyStopColor = isClippedToText ? modifyForegroundColor : modifyGradientColor;
+
         const getGradientModifier = (gradient: ParsedGradient) => {
             const {typeGradient, match, hasComma} = gradient;
 
@@ -462,20 +468,20 @@ export function getBgImageModifier(
 
                 let rgb = parseColorWithCache(part);
                 if (rgb) {
-                    return (theme: Theme) => modifyGradientColor(rgb!, theme);
+                    return (theme: Theme) => modifyStopColor(rgb!, theme);
                 }
 
                 const space = part.lastIndexOf(' ');
                 rgb = parseColorWithCache(part.substring(0, space));
                 if (rgb) {
-                    return (theme: Theme) => `${modifyGradientColor(rgb!, theme)} ${part.substring(space + 1)}`;
+                    return (theme: Theme) => `${modifyStopColor(rgb!, theme)} ${part.substring(space + 1)}`;
                 }
 
                 const colorStopMatch = part.match(colorStopRegex);
                 if (colorStopMatch) {
                     rgb = parseColorWithCache(colorStopMatch[3]);
                     if (rgb) {
-                        return (theme: Theme) => `${colorStopMatch[1]}(${colorStopMatch[2] ? `${colorStopMatch[2]}, ` : ''}${modifyGradientColor(rgb!, theme)})`;
+                        return (theme: Theme) => `${colorStopMatch[1]}(${colorStopMatch[2] ? `${colorStopMatch[2]}, ` : ''}${modifyStopColor(rgb!, theme)})`;
                     }
                 }
 
