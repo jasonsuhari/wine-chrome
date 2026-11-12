@@ -304,52 +304,30 @@ export class VariablesStore {
         if (property === 'background' || property === 'background-image' || property === 'box-shadow') {
             return (theme) => {
                 const unknownVars = new Set<string>();
-                const literalsModified = modifyColorsOutsideVariables(sourceValue, (color) => tryModifyBgColor(color, theme));
-                const modify = (wrapUnknownVars = false) => {
-                    const variableReplaced = replaceCSSVariablesNames(
-                        literalsModified,
-                        (v) => {
-                            if (this.isVarType(v, VAR_TYPE_BG_COLOR)) {
-                                return wrapBgColorVariableName(v);
-                            }
-                            if (this.isVarType(v, VAR_TYPE_BG_IMG)) {
-                                return wrapBgImgVariableName(v);
-                            }
-                            unknownVars.add(v);
-                            return wrapUnknownVars ? wrapBgColorVariableName(v) : v;
-                        },
-                        (fallback) => tryModifyBgColor(fallback, theme),
-                    );
-                    // Check if the property is box-shadow and if so, do a pass-through to modify the shadow.
-                    if (property === 'box-shadow') {
-                        const shadowModifier = getShadowModifierWithInfo(variableReplaced)!;
-                        const modifiedShadow = shadowModifier(theme);
-                        if (modifiedShadow.unparsableMatchesLength !== modifiedShadow.matchesLength) {
-                            return modifiedShadow.result;
+                const namesReplaced = replaceCSSVariablesNames(
+                    sourceValue,
+                    (v) => {
+                        if (this.isVarType(v, VAR_TYPE_BG_COLOR)) {
+                            return wrapBgColorVariableName(v);
                         }
-                    }
-                    return variableReplaced;
-                };
-
-                const modified = modify();
-                if (unknownVars.size > 0) {
-                    // web.dev and voice.google.com issue where the variable is never defined, but the fallback is.
-                    if (isFallbackResolved(modified)) {
-                        return modify(true);
-                    }
-                    return new Promise<string>((resolve) => {
-                        for (const unknownVar of unknownVars.values()) {
-                            const callback = () => {
-                                this.unsubscribeFromVariableTypeChanges(unknownVar, callback);
-                                const newValue = modify();
-                                resolve(newValue);
-                            };
-                            this.subscribeForVarTypeChange(unknownVar, callback);
+                        if (this.isVarType(v, VAR_TYPE_BG_IMG)) {
+                            return wrapBgImgVariableName(v);
                         }
-                    });
+                        unknownVars.add(v);
+                        return v;
+                    },
+                    (fallback) => tryModifyBgColor(fallback, theme),
+                );
+                const unknownCascaded = cascadeUnknownBgVariables(namesReplaced, unknownVars);
+                const variableReplaced = modifyColorsOutsideVariables(unknownCascaded, (color) => tryModifyBgColor(color, theme));
+                if (property === 'box-shadow') {
+                    const shadowModifier = getShadowModifierWithInfo(variableReplaced)!;
+                    const modifiedShadow = shadowModifier(theme);
+                    if (modifiedShadow.unparsableMatchesLength !== modifiedShadow.matchesLength) {
+                        return modifiedShadow.result;
+                    }
                 }
-
-                return modified;
+                return variableReplaced;
             };
         }
         if (property.startsWith('border') || property.startsWith('outline')) {
@@ -770,6 +748,20 @@ export function replaceCSSVariablesNames(
     return replaceVariablesMatches(value, matchReplacer);
 }
 
+function cascadeUnknownBgVariables(value: string, unknownVars: Set<string>): string {
+    if (unknownVars.size === 0) {
+        return value;
+    }
+    return replaceVariablesMatches(value, (match) => {
+        const {name, fallback} = getVariableNameAndFallback(match);
+        const own = fallback ? `var(${name}, ${cascadeUnknownBgVariables(fallback, unknownVars)})` : match;
+        if (!unknownVars.has(name)) {
+            return own;
+        }
+        return `var(${wrapBgColorVariableName(name)}, var(${wrapBgImgVariableName(name)}, ${own}))`;
+    });
+}
+
 function getVarFallback(value: string): string {
     return replaceVariablesMatches(value, (match) => {
         const {fallback} = getVariableNameAndFallback(match);
@@ -816,36 +808,6 @@ function isConstructedColorVar(value: string) {
         value.match(/^\s*(rgb|hsl)a?\(/) ||
         value.match(/^(((\d{1,3})|(var\([\-_A-Za-z0-9]+\))),?\s*?){3}$/)
     );
-}
-
-function isFallbackResolved(modified: string) {
-    if (modified.startsWith('var(') && modified.endsWith(')')) {
-        const hasNestedBrackets = modified.endsWith('))');
-        const hasDoubleNestedBrackets = modified.endsWith(')))');
-        const lastOpenBracketIndex = hasNestedBrackets ? modified.lastIndexOf('(') : -1;
-        const firstOpenBracketIndex = hasDoubleNestedBrackets ? modified.lastIndexOf('(', lastOpenBracketIndex - 1) : lastOpenBracketIndex;
-
-        const commaIndex = modified.lastIndexOf(',', hasNestedBrackets ? firstOpenBracketIndex : modified.length);
-        if (commaIndex < 0 || modified[commaIndex + 1] !== ' ') {
-            return false;
-        }
-
-        const fallback = modified.slice(commaIndex + 2, modified.length - 1);
-        if (hasNestedBrackets) {
-            return (
-                fallback.startsWith('rgb(') ||
-                fallback.startsWith('rgba(') ||
-                fallback.startsWith('hsl(') ||
-                fallback.startsWith('hsla(') ||
-                fallback.startsWith('var(--darkreader-bg--') ||
-                fallback.startsWith('var(--darkreader-background-') ||
-                (hasDoubleNestedBrackets && fallback.includes('var(--darkreader-background-'))
-            );
-        }
-        return fallback.match(/^(#[0-9a-f]+)|([a-z]+)$/i);
-    }
-
-    return false;
 }
 
 const textColorProps = [
