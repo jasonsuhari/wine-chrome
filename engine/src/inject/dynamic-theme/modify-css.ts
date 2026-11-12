@@ -327,11 +327,7 @@ function getColorModifier(prop: string, value: string, rule: CSSStyleRule): stri
 
     if (prop.includes('background')) {
         const maskImageValue = rule.style.maskImage ?? rule.style.mask;
-        if (
-            maskImageValue &&
-            !maskImageValue.startsWith('none') &&
-            !maskImageValue.startsWith('linear-gradient')
-        ) {
+        if (maskImageValue?.includes('url(')) {
             return (theme) => modifyForegroundColor(rgb, theme);
         }
         return (theme) => modifyBackgroundColor(rgb, theme);

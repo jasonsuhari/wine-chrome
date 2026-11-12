@@ -88,8 +88,8 @@ const CASES = {
     return [all.length > 0 && all.every((c) => hsl(c).l > 0.5), all.map(fmt).join(' ')];
   },
   'css-in-js dark button stays dark'() {
-    const c = color('.cssinjs-btn', 'background-color');
-    return [hsl(c).l < 0.35, fmt(c)];
+    const cs = ['.cssinjs-btn', '.cssinjs-reset-btn'].map((s) => color(s, 'background-color'));
+    return [cs.every((c) => hsl(c).l < 0.35), cs.map(fmt).join(' ')];
   },
   'two-tone icons keep two tones'() {
     const a = [color('.two-tone circle', 'fill'), color('.two-tone path', 'fill')];

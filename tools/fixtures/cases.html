@@ -83,7 +83,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 <div class="row"><b>background var with image</b><div class="box btn-shorthand"></div></div>
 <div class="row"><b>mask icon keeps colour</b><div class="box mask-icon" style="width:28px"></div></div>
 <div class="row"><b>gradient text stays light</b><span class="grad-text">PROLED</span></div>
-<div class="row"><b>css-in-js dark button</b><button class="cssinjs-btn">Got it</button></div>
+<div class="row"><b>css-in-js dark button</b><button class="cssinjs-btn">Got it</button><button class="cssinjs-reset-btn">Reset</button></div>
 
 <div class="row"><b>two-tone icon</b>
   <svg class="two-tone" width="28" height="28" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#378fe9"/><path d="M4 9h8v3H4z" fill="#d0e8ff"/></svg>
@@ -115,6 +115,7 @@ customElements.define('wine-time', class extends HTMLElement {
 });
 const sheet = document.head.appendChild(document.createElement('style')).sheet;
 sheet.insertRule('.cssinjs-btn { background: #1b222c; color: #edeff2; border: 0; padding: 6px 10px; }');
+sheet.insertRule('.cssinjs-reset-btn { all: unset; background: #1b222c; color: #edeff2; padding: 6px 10px; }');
 </script>
 <script src="cases.js"></script>
 </body>
