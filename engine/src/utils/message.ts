@@ -48,7 +48,8 @@ export enum MessageTypeCStoBG {
     DOCUMENT_CONNECT = 'cs-bg-document-connect',
     DOCUMENT_FORGET = 'cs-bg-document-forget',
     DOCUMENT_FREEZE = 'cs-bg-document-freeze',
-    DOCUMENT_RESUME = 'cs-bg-document-resume'
+    DOCUMENT_RESUME = 'cs-bg-document-resume',
+    INSERT_USER_CSS = 'cs-bg-insert-user-css'
 }
 
 export enum DebugMessageTypeCStoBG {

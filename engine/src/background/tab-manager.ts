@@ -266,6 +266,17 @@ export default class TabManager {
                     return true;
                 }
 
+                case MessageTypeCStoBG.INSERT_USER_CSS: {
+                    if (__CHROMIUM_MV3__ && sender.tab?.id != null && sender.frameId != null) {
+                        chrome.scripting.insertCSS({
+                            target: {tabId: sender.tab.id, frameIds: [sender.frameId]},
+                            css: message.data,
+                            origin: 'USER',
+                        }).catch(logWarn);
+                    }
+                    break;
+                }
+
                 case MessageTypeUItoBG.COLOR_SCHEME_CHANGE:
                     // fallthrough
                 case MessageTypeCStoBG.COLOR_SCHEME_CHANGE:
