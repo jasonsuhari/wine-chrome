@@ -13,7 +13,7 @@ import {removeNode, watchForNodePosition, iterateShadowHosts, isDOMReady, remove
 import {logInfo, logWarn} from '../utils/log';
 
 import type {AdoptedStyleSheetManager} from './adopted-style-manger';
-import {createAdoptedStyleSheetOverride, canHaveAdoptedStyleSheets} from './adopted-style-manger';
+import {createAdoptedStyleSheetOverride, canHaveAdoptedStyleSheets, isDarkReaderSheet, markDarkReaderSheet} from './adopted-style-manger';
 import {combineFixes, findRelevantFix} from './fixes';
 import {getStyleInjectionMode, injectStyleAway, removeStyleContainer} from './injection';
 import {overrideInlineStyle, getInlineOverrideStyle, watchForInlineStyles, stopWatchingForInlineStyles, INLINE_STYLE_SELECTOR} from './inline-style';
@@ -156,6 +156,11 @@ const scheduleInversionStyleUpdate = throttle(() => {
         invertStyle.textContent = getInversionStyleValue();
     }
     shadowRootsWithOverrides.forEach((root) => {
+        const adoptedInvertSheet = shadowStaticSheets.get(root)?.[2];
+        if (adoptedInvertSheet) {
+            adoptedInvertSheet.replaceSync(getInversionStyleValue());
+            return;
+        }
         const shadowInvertStyle = root.querySelector<HTMLStyleElement>('.darkreader--invert');
         if (shadowInvertStyle) {
             shadowInvertStyle.textContent = getInversionStyleValue();
@@ -333,6 +338,35 @@ function createStaticStyleOverrides() {
 }
 
 const shadowRootsWithOverrides = new Set<ShadowRoot>();
+const shadowStaticSheets = new WeakMap<ShadowRoot, CSSStyleSheet[]>();
+
+function canAdoptShadowStaticSheets(root: ShadowRoot) {
+    return !isFirefox && canHaveAdoptedStyleSheets(root);
+}
+
+function adoptShadowStaticSheets(root: ShadowRoot) {
+    let sheets = shadowStaticSheets.get(root);
+    if (!sheets) {
+        sheets = [new CSSStyleSheet(), new CSSStyleSheet(), new CSSStyleSheet()];
+        sheets.forEach(markDarkReaderSheet);
+        shadowStaticSheets.set(root, sheets);
+    }
+    const [inlineSheet, overrideSheet, invertSheet] = sheets;
+    inlineSheet.replaceSync(getInlineOverrideStyle());
+    overrideSheet.replaceSync(fixes && fixes.css ? replaceCSSTemplates(fixes.css) : '');
+    invertSheet.replaceSync(getInversionStyleValue());
+    if (sheets.some((sheet) => !root.adoptedStyleSheets.includes(sheet))) {
+        root.adoptedStyleSheets = [...sheets, ...root.adoptedStyleSheets.filter((sheet) => !sheets.includes(sheet))];
+    }
+    shadowRootsWithOverrides.add(root);
+}
+
+function removeShadowStaticSheets(root: ShadowRoot) {
+    const sheets = shadowStaticSheets.get(root);
+    if (sheets) {
+        root.adoptedStyleSheets = root.adoptedStyleSheets.filter((sheet) => !sheets.includes(sheet));
+    }
+}
 
 function createShadowStaticStyleOverridesInner(root: ShadowRoot) {
     const inlineStyle = createOrUpdateStyle('darkreader--inline', root);
@@ -371,6 +405,11 @@ function delayedCreateShadowStaticStyleOverrides(root: ShadowRoot): void {
 function createShadowStaticStyleOverrides(root: ShadowRoot) {
     if (__PLUS__) {
         reuseStaticStyleOverrides(root);
+        return;
+    }
+
+    if (canAdoptShadowStaticSheets(root)) {
+        adoptShadowStaticSheets(root);
         return;
     }
 
@@ -547,7 +586,9 @@ function unwrap<T>(value: T): T {
 function handleAdoptedStyleSheets(node: ShadowRoot | Document) {
     if (canHaveAdoptedStyleSheets(node)) {
         forEach(isFirefox ? unwrap(node.adoptedStyleSheets) : node.adoptedStyleSheets, (s) => {
-            variablesStore.addRulesForMatching(s.cssRules);
+            if (!isDarkReaderSheet(s)) {
+                variablesStore.addRulesForMatching(s.cssRules);
+            }
         });
         const newManger = createAdoptedStyleSheetOverride(node);
         adoptedStyleManagers.push(newManger);
@@ -558,6 +599,9 @@ function handleAdoptedStyleSheets(node: ShadowRoot | Document) {
             });
             variablesStore.matchVariablesAndDependents();
             newManger.render(theme!, ignoredImageAnalysisSelectors);
+            if (node instanceof ShadowRoot && shadowStaticSheets.has(node)) {
+                adoptShadowStaticSheets(node);
+            }
         });
     }
 }
@@ -1033,6 +1077,7 @@ export function removeDynamicTheme(): void {
         removeProxy();
     }
     shadowRootsWithOverrides.forEach((root) => {
+        removeShadowStaticSheets(root);
         removeNode(root.querySelector('.darkreader--inline'));
         removeNode(root.querySelector('.darkreader--override'));
     });

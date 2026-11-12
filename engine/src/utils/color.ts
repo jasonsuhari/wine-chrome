@@ -1,5 +1,4 @@
 import {evalMath} from './math-eval';
-import {isSystemDarkModeEnabled} from './media-query';
 import {getParenthesesRange} from './text';
 
 export interface RGBA {
@@ -25,10 +24,12 @@ export function parseColorWithCache($color: string): RGBA | null {
     if (rgbaParseCache.has(key)) {
         return rgbaParseCache.get(key)!;
     }
+    let color: RGBA | null;
     if ($color.includes('calc(')) {
-        $color = lowerCalcExpression($color);
+        color = parse(lowerCalcExpression($color)) ?? parseWithBrowser($color);
+    } else {
+        color = parse($color);
     }
-    const color = parse($color);
     rgbaParseCache.set(key, color);
     return color;
 }
@@ -206,14 +207,25 @@ export function parse($color: string): RGBA | null {
     }
 
     if (c.startsWith('light-dark(') && c.endsWith(')')) {
-        // light-dark([color()], [color()])
-        const match = c.match(/^light-dark\(\s*([a-z]+(\(.*\))?),\s*([a-z]+(\(.*\))?)\s*\)$/);
-        if (match) {
-            const schemeColor = isSystemDarkModeEnabled() ? match[3] : match[1];
-            return parse(schemeColor);
-        }
+        const lightColor = getFirstArgument(c.slice('light-dark('.length, -1));
+        return lightColor ? parse(lightColor) : null;
     }
 
+    return null;
+}
+
+function getFirstArgument(args: string): string | null {
+    let depth = 0;
+    for (let i = 0; i < args.length; i++) {
+        const char = args[i];
+        if (char === '(') {
+            depth++;
+        } else if (char === ')') {
+            depth--;
+        } else if (char === ',' && depth === 0) {
+            return args.slice(0, i);
+        }
+    }
     return null;
 }
 
@@ -673,6 +685,13 @@ export function getSRGBLightness(r: number, g: number, b: number): number {
 
 let canvas: HTMLCanvasElement;
 let context: CanvasRenderingContext2D;
+
+function parseWithBrowser($color: string): RGBA | null {
+    if (typeof CSS === 'undefined' || !CSS.supports('color', $color)) {
+        return null;
+    }
+    return domParseColor($color);
+}
 
 function domParseColor($color: string) {
     if (!context) {

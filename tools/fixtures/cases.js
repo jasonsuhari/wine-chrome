@@ -37,13 +37,15 @@ const CASES = {
     return [cs.every(isWineHue), cs.map(fmt).join(' ')];
   },
   'oklch background becomes dark wine'() {
-    const c = color('.oklch-bg', 'background-color');
-    return [hsl(c).l < 0.3 && isWineHue(c), fmt(c)];
+    const cs = ['.oklch-bg', '.oklch-var-bg', '.oklch-from-var'].map((s) => color(s, 'background-color'));
+    return [cs.every((c) => hsl(c).l < 0.3 && isWineHue(c)), cs.map(fmt).join(' ')];
   },
   'hsl() with calc() keeps its hue'() {
     const c = color('.calc-hsl', 'color');
+    const bg = color('.calc-hsl-var', 'background-color');
     const {h} = hsl(c);
-    return [h >= 5 && h <= 60, `${fmt(c)} h=${h.toFixed(0)}`];
+    const bgHsl = hsl(bg);
+    return [h >= 5 && h <= 60 && bgHsl.h >= 5 && bgHsl.h <= 60 && bgHsl.l < 0.35, `${fmt(c)} h=${h.toFixed(0)} bg=${fmt(bg)} h=${bgHsl.h.toFixed(0)}`];
   },
   'light-dark() surfaces become wine'() {
     const cs = ['.ld-bg', '.ld-card'].map((s) => color(s, 'background-color'));
@@ -66,10 +68,15 @@ const CASES = {
     const borders = [color('.hairline', 'border-right-color'), color('.hairline-logical', 'border-right-color')];
     return [borders.every((b) => b.a < 0.6 && hsl(b).l > 0.15 && dist(b, text) > 1), `borders=${borders.map(fmt).join(' ')} text=${fmt(text)}`];
   },
+  'light-dark() lowered to toggle vars stays valid'() {
+    const text = color('.toggle-border', 'color');
+    const border = color('.toggle-border', 'border-right-color');
+    const bg = color('.toggle-bg', 'background-color');
+    return [border.a < 0.6 && dist(border, text) > 1 && bg.a === 1 && hsl(bg).l < 0.3, `border=${fmt(border)} bg=${fmt(bg)} text=${fmt(text)}`];
+  },
   'background var holding colour and image keeps both'() {
-    const img = style('.btn-shorthand', 'background-image');
-    const c = color('.btn-shorthand', 'background-color');
-    return [img !== 'none' && hsl(c).s > 0.4, `${fmt(c)} image=${img.slice(0, 30)}`];
+    const results = ['.btn-shorthand', '.btn-imported'].map((s) => [style(s, 'background-image'), color(s, 'background-color')]);
+    return [results.every(([img, c]) => img !== 'none' && hsl(c).s > 0.4), results.map(([img, c]) => `${fmt(c)} image=${img.slice(0, 30)}`).join(' | ')];
   },
   'mask icon keeps a visible colour'() {
     const c = color('.mask-icon', 'background-color');
@@ -80,8 +87,8 @@ const CASES = {
     return [all.length > 0 && all.every((c) => hsl(c).l > 0.5), all.map(fmt).join(' ')];
   },
   'css-in-js dark button stays dark'() {
-    const c = color('.cssinjs-btn', 'background-color');
-    return [hsl(c).l < 0.35, fmt(c)];
+    const cs = ['.cssinjs-btn', '.cssinjs-reset-btn'].map((s) => color(s, 'background-color'));
+    return [cs.every((c) => hsl(c).l < 0.35), cs.map(fmt).join(' ')];
   },
   'two-tone icons keep two tones'() {
     const a = [color('.two-tone circle', 'fill'), color('.two-tone path', 'fill')];
@@ -97,7 +104,7 @@ const CASES = {
     return [hsl(c).l > 0.5, fmt(c)];
   },
   'display-p3 stroke stays valid and light'() {
-    const raws = ['.p3-stroke', '.p3-attr'].map((s) => style(s, 'stroke'));
+    const raws = ['.p3-stroke', '.p3-attr', '.p3-built-attr'].map((s) => style(s, 'stroke'));
     return [raws.every((raw) => raw !== 'none' && hsl(rgba(raw)).l > 0.5), raws.join(' | ')];
   },
   'svg mask contents are untouched'() {

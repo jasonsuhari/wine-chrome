@@ -71,6 +71,14 @@ const shorthandVarDependantProperties = [
     'border-left',
     'border-right',
     'border-top',
+    'border-block',
+    'border-block-color',
+    'border-block-end',
+    'border-block-start',
+    'border-inline',
+    'border-inline-color',
+    'border-inline-end',
+    'border-inline-start',
     'outline',
     'outline-color',
 ];
@@ -116,23 +124,30 @@ export function iterateCSSDeclarations(style: CSSStyleDeclaration, iterate: (pro
 
     forEach(style, (property) => {
         const value = style.getPropertyValue(property).trim();
-        if (!value) {
+        if (!value && !isCustomProperty(property)) {
             return;
         }
         iterate(property, value);
     });
 }
 
+const sheetSourceTexts = new WeakMap<CSSStyleSheet, string>();
+
+export function setSheetSourceText(sheet: CSSStyleSheet, text: string): void {
+    sheetSourceTexts.set(sheet, text);
+}
+
 // `rule.cssText` fails when the rule has both
 // `background: var()` and `background-*`.
 // This fix retrieves the source value from CSS text,
-// but will only work for <style> elements and
+// but will only work for <style> elements and fetched sheets and
 // there is a chance of multiple matches.
 // https://issues.chromium.org/issues/40252592
 function handleEmptyShorthand(shorthand: string, style: CSSStyleDeclaration, iterate: (property: string, value: string) => void) {
     const parentRule = style.parentRule;
     if (isStyleRule(parentRule)) {
-        const sourceCSSText = parentRule.parentStyleSheet?.ownerNode?.textContent;
+        const sheet = parentRule.parentStyleSheet;
+        const sourceCSSText = sheet && (sheetSourceTexts.get(sheet) ?? sheet.ownerNode?.textContent);
         if (sourceCSSText) {
             let escapedSelector = escapeRegExpSpecialChars(parentRule.selectorText);
             escapedSelector = escapedSelector.replaceAll(/\s+/g, '\\s*'); // Space count can differ
@@ -303,4 +318,8 @@ export function getRuleMediaText(rule: CSSRule): string {
         parent = parent.parentRule;
     }
     return media.join(' and ');
+}
+
+export function isCustomProperty(property: string): boolean {
+    return property.startsWith('--');
 }

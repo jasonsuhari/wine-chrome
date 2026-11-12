@@ -147,6 +147,13 @@ export function getInlineOverrideStyle(): string {
     ]).join('\n');
 }
 
+export function getInlineImportantOverrideStyle(): string {
+    const allOverrides = overridesList.concat(Object.values(shorthandOverrides));
+    return allOverrides.map(({dataAttr, customProp, cssProp}) => {
+        return `html[data-darkreader-mode] [${dataAttr}="important"] { ${cssProp}: var(${customProp}) !important; }`;
+    }).join('\n');
+}
+
 function getInlineStyleElements(root: Node) {
     const results: HTMLElement[] = [];
     if (root instanceof Element && root.matches(INLINE_STYLE_SELECTOR)) {
@@ -418,6 +425,10 @@ export function overrideInlineStyle(element: HTMLElement, theme: Theme, ignoreIn
         return;
     }
 
+    if (element instanceof SVGElement && element.closest('mask, clipPath')) {
+        return;
+    }
+
     const cacheKey = getInlineStyleCacheKey(element, theme);
     if (cacheKey === inlineStyleCache.get(element)) {
         return;
@@ -457,8 +468,10 @@ export function overrideInlineStyle(element: HTMLElement, theme: Theme, ignoreIn
 
             const {customProp, dataAttr} = overrides[targetCSSProp] ?? shorthandOverrides[targetCSSProp];
             element.style.setProperty(customProp, value);
-            if (!element.hasAttribute(dataAttr)) {
-                element.setAttribute(dataAttr, '');
+            const isImportant = sourceAttr === 'style' && element.style.getPropertyPriority(sourceCSSProp) === 'important';
+            const dataAttrValue = isImportant ? 'important' : '';
+            if (element.getAttribute(dataAttr) !== dataAttrValue) {
+                element.setAttribute(dataAttr, dataAttrValue);
             }
             trackInlineStyleTeardown(element);
             unsetProps.delete(targetCSSProp);

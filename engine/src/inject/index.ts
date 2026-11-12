@@ -9,6 +9,7 @@ import {writeEnabledForHost} from './cache';
 import {runDarkThemeDetector, stopDarkThemeDetector} from './detector';
 import {createOrUpdateDynamicTheme, removeDynamicTheme, cleanDynamicThemeCache} from './dynamic-theme';
 import {collectCSS} from './dynamic-theme/css-collection';
+import {getInlineImportantOverrideStyle} from './dynamic-theme/inline-style';
 import {createOrUpdateStyle, removeStyle} from './style';
 import {createOrUpdateSVGFilter, removeSVGFilter} from './svg-filter';
 import {logWarn, logInfoCollapsed} from './utils/log';
@@ -33,6 +34,7 @@ const scriptId = generateUID();
 const CONNECTION_TIMEOUT = 1000;
 const CONNECTION_RETRIES = 10;
 let didConnect = false;
+let didInsertUserCSS = false;
 let connectionRetries = 0;
 let connectionTimeoutId = 0;
 
@@ -148,6 +150,10 @@ function onMessage(message: MessageBGtoCS | MessageUItoCS | DebugMessageBGtoCS) 
             removeStyle();
             createOrUpdateDynamicTheme(theme, fixes, isIFrame);
             writeEnabledForHost(true);
+            if (__CHROMIUM_MV3__ && !didInsertUserCSS) {
+                didInsertUserCSS = true;
+                sendMessage({type: MessageTypeCStoBG.INSERT_USER_CSS, scriptId, data: getInlineImportantOverrideStyle()});
+            }
             if (detectDarkTheme) {
                 runDarkThemeDetector((hasDarkTheme) => {
                     if (hasDarkTheme) {

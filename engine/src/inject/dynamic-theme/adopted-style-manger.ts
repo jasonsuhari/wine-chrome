@@ -34,7 +34,11 @@ const createOverrideSheet: () => CSSStyleSheet = isFirefox ?
     } :
     () => new CSSStyleSheet();
 
-function isDarkReaderSheet(sheet: CSSStyleSheet): boolean {
+export function markDarkReaderSheet(sheet: CSSStyleSheet): void {
+    drSheetCheckResults.set(sheet, true);
+}
+
+export function isDarkReaderSheet(sheet: CSSStyleSheet): boolean {
     let result = drSheetCheckResults.get(sheet);
     if (result != null) {
         return result;

@@ -9,7 +9,7 @@ import {readCSSFetchCache, writeCSSFetchCache} from '../cache';
 import {watchForNodePosition, removeNode, iterateShadowHosts, addReadyStateCompleteListener} from '../utils/dom';
 import {logInfo, logWarn} from '../utils/log';
 
-import {replaceCSSRelativeURLsWithAbsolute, replaceCSSFontFace, getCSSURLValue, cssImportRegex, getCSSBaseBath, ignoredMedia} from './css-rules';
+import {replaceCSSRelativeURLsWithAbsolute, replaceCSSFontFace, getCSSURLValue, cssImportRegex, getCSSBaseBath, ignoredMedia, setSheetSourceText} from './css-rules';
 import {getStyleInjectionMode, injectStyleAway} from './injection';
 import {bgFetch} from './network';
 import {createStyleSheetModifier} from './stylesheet-modifier';
@@ -335,11 +335,13 @@ export function manageStyle(element: StyleElement, {update, loadingStart, loadin
                 if (corsCopies.has(element)) {
                     if ((corsCopiesTextLengths.get(element) ?? 0) < fullCSSText.length) {
                         corsCopies.get(element)!.replaceSync(fullCSSText);
+                        setSheetSourceText(corsCopies.get(element)!, fullCSSText);
                         corsCopiesTextLengths.set(element, fullCSSText.length);
                     }
                 } else {
                     const corsCopy = new CSSStyleSheet();
                     corsCopy.replaceSync(fullCSSText);
+                    setSheetSourceText(corsCopy, fullCSSText);
                     corsCopies.set(element, corsCopy);
                 }
             } catch (err) {
