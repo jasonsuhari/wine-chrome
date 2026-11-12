@@ -278,11 +278,6 @@ export function createStyleSheetModifier(): StyleSheetModifier {
                 const currentRenderId = renderId;
                 const initialIndex = readyDeclarations.length;
                 let oldDecs: ReadyDeclaration[] = [];
-                if (varDecs.length === 0) {
-                    const tempDec = {property: `--darkreader-placeholder-${varKey}`, value: 'none', important: false, sourceValue, varKey};
-                    readyDeclarations.push(tempDec);
-                    oldDecs = [tempDec];
-                }
                 varDecs.forEach((mod) => {
                     if (mod.value instanceof Promise) {
                         handleAsyncDeclaration(mod.property, mod.value, important, sourceValue);
@@ -292,6 +287,11 @@ export function createStyleSheetModifier(): StyleSheetModifier {
                         oldDecs.push(readyDec);
                     }
                 });
+                if (oldDecs.length === 0) {
+                    const tempDec = {property: `--darkreader-placeholder-${varKey}`, value: 'none', important: false, sourceValue, varKey};
+                    readyDeclarations.push(tempDec);
+                    oldDecs = [tempDec];
+                }
                 onTypeChange.addListener((newDecs) => {
                     if (isAsyncCancelled() || currentRenderId !== renderId) {
                         return;
