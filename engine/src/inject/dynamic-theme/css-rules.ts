@@ -124,7 +124,7 @@ export function iterateCSSDeclarations(style: CSSStyleDeclaration, iterate: (pro
 
     forEach(style, (property) => {
         const value = style.getPropertyValue(property).trim();
-        if (!value) {
+        if (!value && !isCustomProperty(property)) {
             return;
         }
         iterate(property, value);
@@ -311,4 +311,8 @@ export function getRuleMediaText(rule: CSSRule): string {
         parent = parent.parentRule;
     }
     return media.join(' and ');
+}
+
+export function isCustomProperty(property: string): boolean {
+    return property.startsWith('--');
 }

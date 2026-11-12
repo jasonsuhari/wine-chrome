@@ -2,7 +2,7 @@ import type {Theme} from '../../definitions';
 import {isChromium} from '../../utils/platform';
 import {createAsyncTasksQueue} from '../../utils/throttle';
 
-import {iterateCSSRules, iterateCSSDeclarations, isMediaRule, isLayerRule, isContainerRule, isStyleRule} from './css-rules';
+import {iterateCSSRules, iterateCSSDeclarations, isMediaRule, isLayerRule, isContainerRule, isStyleRule, isCustomProperty} from './css-rules';
 import {themeCacheKeys} from './modify-colors';
 import type {ModifiableCSSDeclaration, ModifiableCSSRule} from './modify-css';
 import {getModifiableCSSDeclaration} from './modify-css';
@@ -203,7 +203,7 @@ export function createStyleSheetModifier(): StyleSheetModifier {
             let ruleText = `${selectorText} {`;
             for (const dec of declarations) {
                 const {property, value, important} = dec;
-                if (value) {
+                if (value || (value === '' && isCustomProperty(property))) {
                     ruleText += ` ${property}: ${value}${important ? ' !important' : ''};`;
                 }
             }

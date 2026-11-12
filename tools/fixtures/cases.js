@@ -66,6 +66,12 @@ const CASES = {
     const borders = [color('.hairline', 'border-right-color'), color('.hairline-logical', 'border-right-color')];
     return [borders.every((b) => b.a < 0.6 && hsl(b).l > 0.15 && dist(b, text) > 1), `borders=${borders.map(fmt).join(' ')} text=${fmt(text)}`];
   },
+  'light-dark() lowered to toggle vars stays valid'() {
+    const text = color('.toggle-border', 'color');
+    const border = color('.toggle-border', 'border-right-color');
+    const bg = color('.toggle-bg', 'background-color');
+    return [border.a < 0.6 && dist(border, text) > 1 && bg.a === 1 && hsl(bg).l < 0.3, `border=${fmt(border)} bg=${fmt(bg)} text=${fmt(text)}`];
+  },
   'background var holding colour and image keeps both'() {
     const img = style('.btn-shorthand', 'background-image');
     const c = color('.btn-shorthand', 'background-color');

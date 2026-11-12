@@ -14,6 +14,12 @@
   --accent: #0b57d0;
   --btn: #f57224 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='5' cy='5' r='4' fill='%23fff'/%3E%3C/svg%3E") center no-repeat;
   --text-solid: #0a2540;
+  --lightningcss-light: initial;
+  --lightningcss-dark: ;
+  --toggle-border: var(--lightningcss-light, #0000001a) var(--lightningcss-dark, #ffffff26);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --lightningcss-light: ; --lightningcss-dark: initial; }
 }
 body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.4 system-ui, sans-serif; }
 .row { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
@@ -34,6 +40,8 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 .link-nested a { color: var(--missing-link, var(--accent)); }
 .hairline { border-right: 6px solid var(--hairline); }
 .hairline-logical { border-inline-end: 6px solid var(--hairline); }
+.toggle-border { border-inline-end: 6px solid var(--toggle-border); }
+.toggle-bg { background: var(--lightningcss-light, #f4f4f4) var(--lightningcss-dark, #303030); }
 .btn-shorthand { background: var(--btn); }
 .mask-icon { background-color: #1a7f37; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Ccircle cx='5' cy='5' r='5'/%3E%3C/svg%3E") center / contain no-repeat; }
 .grad-text { background: linear-gradient(90deg, #fff, #f5f5f7, #ffd60a); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 22px; font-weight: 700; }
@@ -59,6 +67,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 <div class="row"><b>fade with var() stop</b><div class="box fade-var"></div><div class="box fade-fallback"></div></div>
 <div class="row link-nested"><b>link via nested var()</b><a href="#x">a link</a></div>
 <div class="row"><b>translucent hairline border</b><div class="box hairline"></div><div class="box hairline-logical"></div></div>
+<div class="row"><b>light-dark toggle vars</b><div class="box toggle-border"></div><div class="box toggle-bg"></div></div>
 <div class="row"><b>background var with image</b><div class="box btn-shorthand"></div></div>
 <div class="row"><b>mask icon keeps colour</b><div class="box mask-icon" style="width:28px"></div></div>
 <div class="row"><b>gradient text stays light</b><span class="grad-text">PROLED</span></div>
