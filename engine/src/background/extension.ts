@@ -596,7 +596,6 @@ export class Extension {
             return;
         }
         const {url} = tab;
-        const isInDarkList = ConfigManager.isURLInDarkList(url);
         const host = getURLHostOrProtocol(url);
 
         function getToggledList(sourceList: string[]) {
@@ -617,7 +616,7 @@ export class Extension {
         }
 
         const darkThemeDetected = settings.enabledByDefault && settings.detectDarkTheme && tab.isDarkThemeDetected;
-        if (!settings.enabledByDefault || isInDarkList || darkThemeDetected) {
+        if (!settings.enabledByDefault || darkThemeDetected) {
             const toggledList = getToggledList(settings.enabledFor);
             Extension.changeSettings({enabledFor: toggledList}, true);
             return;
