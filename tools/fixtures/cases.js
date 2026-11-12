@@ -99,6 +99,10 @@ const CASES = {
     const b = [color('.two-tone-white rect', 'fill'), color('.two-tone-white path', 'fill')];
     return [dist(...a) > 50 && dist(...b) > 50, [...a, ...b].map(fmt).join(' ')];
   },
+  'wide light wordmark stays light'() {
+    const c = color('.wordmark path', 'fill');
+    return [hsl(c).l > 0.6, fmt(c)];
+  },
   'svg with default fill is not black'() {
     const c = color('.default-fill path', 'fill');
     return [hsl(c).l > 0.5, fmt(c)];

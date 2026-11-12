@@ -631,7 +631,7 @@ export function overrideInlineStyle(element: HTMLElement, theme: Theme, ignoreIn
                             isBg = false;
                         } else {
                             const {width, height} = element.getBoundingClientRect();
-                            isBg = (width > SMALL_SVG_THRESHOLD || height > SMALL_SVG_THRESHOLD);
+                            isBg = (width > SMALL_SVG_THRESHOLD && height > SMALL_SVG_THRESHOLD);
                         }
                         overrideValue('fill', '', 'fill', isBg ? 'background-color' : 'fill', value, value);
                     };
