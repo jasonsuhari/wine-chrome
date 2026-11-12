@@ -303,7 +303,7 @@ export function createStyleSheetModifier(): StyleSheetModifier {
                     const index = readyDeclarations.indexOf(oldDecs[0], initialIndex);
                     readyDeclarations.splice(index, oldDecs.length, ...readyVarDecs);
                     oldDecs = readyVarDecs;
-                    rebuildVarRule(varKey);
+                    scheduleVarRuleRebuild(varKey);
                 });
                 varTypeChangeCleaners.add(() => onTypeChange.removeListeners());
             }
@@ -374,12 +374,13 @@ export function createStyleSheetModifier(): StyleSheetModifier {
 
             iterateReadyRules(rootReadyGroup, sheet, (rule, target) => {
                 const index = target.cssRules.length;
+                const info = {rule, target, index};
                 rule.declarations.forEach(({asyncKey, varKey}) => {
                     if (asyncKey != null) {
-                        asyncDeclarations.set(asyncKey, {rule, target, index});
+                        asyncDeclarations.set(asyncKey, info);
                     }
                     if (varKey != null) {
-                        varDeclarations.set(varKey, {rule, target, index});
+                        varDeclarations.set(varKey, info);
                     }
                 });
                 setRule(target, index, rule);
@@ -393,10 +394,26 @@ export function createStyleSheetModifier(): StyleSheetModifier {
             asyncDeclarations.delete(key);
         }
 
-        function rebuildVarRule(key: number) {
-            const {rule, target, index} = varDeclarations.get(key)!;
-            target.deleteRule(index);
-            setRule(target, index, rule);
+        const varRulesToRebuild = new Set<RuleInfo>();
+        const sheetRenderId = renderId;
+
+        function scheduleVarRuleRebuild(key: number) {
+            if (varRulesToRebuild.size === 0) {
+                queueMicrotask(rebuildVarRules);
+            }
+            varRulesToRebuild.add(varDeclarations.get(key)!);
+        }
+
+        function rebuildVarRules() {
+            const infos = [...varRulesToRebuild];
+            varRulesToRebuild.clear();
+            if (isAsyncCancelled() || sheetRenderId !== renderId) {
+                return;
+            }
+            infos.forEach(({rule, target, index}) => {
+                target.deleteRule(index);
+                setRule(target, index, rule);
+            });
         }
 
         buildStyleSheet();
