@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wine cases</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --ld-bg: light-dark(#ffffff, #171717);
+  --ld-card: light-dark(#dde7f1, #38434f);
+  --p3-fg: color(display-p3 .133 .133 .133);
+  --hairline: #0000001a;
+  --x-white: #ffffff;
+  --accent: #0b57d0;
+  --btn: #f57224 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='5' cy='5' r='4' fill='%23fff'/%3E%3C/svg%3E") center no-repeat;
+  --text-solid: #0a2540;
+}
+body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.4 system-ui, sans-serif; }
+.row { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
+.row > b { width: 220px; font-weight: 500; }
+.box { width: 60px; height: 28px; }
+
+.dark-0 { background: #000; } .dark-1 { background: #111; } .dark-2 { background: #1f1f1f; } .dark-3 { background: #2a2a2a; }
+.warm-grey { background: #f4f2ee; } .slate { background: #38434f; } .cool-grey { background: #cedeee; } .pale-blue { background: #f8fafd; }
+
+.oklch-bg { background: oklch(0.97 0.01 250); }
+.calc-hsl { color: hsl(calc(20 + 7) 90% 45%); }
+.ld-bg { background: var(--ld-bg); }
+.ld-card { background-color: var(--ld-card); }
+.relative-bg { background: rgb(from #ffffff r g b / 90%); }
+
+.fade-var { background: linear-gradient(transparent 0, #ffffffe6 20px, var(--x-white) 28px); }
+.fade-fallback { background: linear-gradient(to bottom, rgba(255,255,255,0), var(--missing-var, #fff)); }
+.link-nested a { color: var(--missing-link, var(--accent)); }
+.hairline { border-right: 6px solid var(--hairline); }
+.hairline-logical { border-inline-end: 6px solid var(--hairline); }
+.btn-shorthand { background: var(--btn); }
+.mask-icon { background-color: #1a7f37; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Ccircle cx='5' cy='5' r='5'/%3E%3C/svg%3E") center / contain no-repeat; }
+.grad-text { background: linear-gradient(90deg, #fff, #f5f5f7, #ffd60a); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 22px; font-weight: 700; }
+.var-fill path { fill: var(--text-solid); }
+.p3-stroke { stroke: var(--p3-fg); }
+
+.hide-bar { width: 200px; overflow-x: scroll; white-space: nowrap; }
+.hide-bar::-webkit-scrollbar { display: none; }
+
+.panel { background: #fff; padding: 6px; }
+.panel input { background: rgba(0, 0, 0, .05); border: 0; padding: 6px; }
+</style>
+</head>
+<body>
+<h1>Wine cases</h1>
+
+<div class="row"><b>dark surfaces keep order</b><div class="box dark-0"></div><div class="box dark-1"></div><div class="box dark-2"></div><div class="box dark-3"></div></div>
+<div class="row"><b>neutral greys become wine</b><div class="box warm-grey"></div><div class="box slate"></div><div class="box cool-grey"></div><div class="box pale-blue"></div></div>
+<div class="row"><b>oklch background</b><div class="box oklch-bg"></div></div>
+<div class="row"><b>hsl with calc keeps orange</b><span class="calc-hsl">orange text</span></div>
+<div class="row"><b>light-dark() surfaces</b><div class="box ld-bg"></div><div class="box ld-card"></div></div>
+<div class="row"><b>relative colour</b><div class="box relative-bg"></div></div>
+<div class="row"><b>fade with var() stop</b><div class="box fade-var"></div><div class="box fade-fallback"></div></div>
+<div class="row link-nested"><b>link via nested var()</b><a href="#x">a link</a></div>
+<div class="row"><b>translucent hairline border</b><div class="box hairline"></div><div class="box hairline-logical"></div></div>
+<div class="row"><b>background var with image</b><div class="box btn-shorthand"></div></div>
+<div class="row"><b>mask icon keeps colour</b><div class="box mask-icon" style="width:28px"></div></div>
+<div class="row"><b>gradient text stays light</b><span class="grad-text">PROLED</span></div>
+<div class="row"><b>css-in-js dark button</b><button class="cssinjs-btn">Got it</button></div>
+
+<div class="row"><b>two-tone icon</b>
+  <svg class="two-tone" width="28" height="28" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#378fe9"/><path d="M4 9h8v3H4z" fill="#d0e8ff"/></svg>
+  <svg class="two-tone-white" width="28" height="28" viewBox="0 0 16 16"><rect width="16" height="16" fill="#2b8ad8"/><path d="M4 4h8v8H4z" fill="#fff"/></svg>
+</div>
+<div class="row"><b>svg default fill</b><svg class="default-fill" width="28" height="28" viewBox="0 0 16 16"><path d="M0 0h16v16H0z"/></svg></div>
+<div class="row"><b>svg fill via var</b><svg class="var-fill" width="28" height="28" viewBox="0 0 16 16"><path d="M0 0h16v16H0z"/></svg></div>
+<div class="row"><b>display-p3 stroke</b><svg width="28" height="28" viewBox="0 0 16 16"><path class="p3-stroke" d="M2 2L14 14" stroke-width="3" fill="none"/></svg><svg width="28" height="28" viewBox="0 0 16 16"><path class="p3-attr" stroke="var(--p3-fg)" d="M2 14L14 2" stroke-width="3" fill="none"/></svg></div>
+<div class="row"><b>svg mask untouched</b>
+  <svg width="80" height="28" viewBox="0 0 80 28"><defs><mask id="cut"><rect class="mask-rect" width="80" height="28" fill="white"/><text class="mask-text" x="8" y="19" fill="black" font-size="14">Sign</text></mask></defs><rect width="80" height="28" fill="#635bff" mask="url(#cut)"/></svg>
+</div>
+
+<div class="row"><b>hidden scrollbar stays hidden</b><div class="hide-bar">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div></div>
+<div class="row"><b>shadow root text</b><wine-time></wine-time></div>
+<div class="row"><b>inline important colour</b><span class="inline-important" style="color: #000080 !important">navy inline</span></div>
+<div class="row"><b>translucent input on panel</b><div class="panel"><input placeholder="Email"></div></div>
+<div class="row"><b>unstyled input</b><input class="plain-input" value="search"></div>
+
+<script>
+customElements.define('wine-time', class extends HTMLElement {
+  connectedCallback() {
+    const root = this.attachShadow({mode: 'open'});
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync('span { color: #57606a; background: #f6f8fa; }');
+    root.adoptedStyleSheets = [sheet];
+    root.innerHTML = '<span>2 hours ago</span>';
+    setInterval(() => { this.dataset.text = root.textContent; }, 200);
+  }
+});
+const sheet = document.head.appendChild(document.createElement('style')).sheet;
+sheet.insertRule('.cssinjs-btn { background: #1b222c; color: #edeff2; border: 0; padding: 6px 10px; }');
+</script>
+<script src="cases.js"></script>
+</body>
+</html>

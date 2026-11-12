@@ -7,3 +7,5 @@ newtab/dist/
 tools/.profile/
 tools/out/
 .DS_Store
+tools/.profile-check/
+tools/.profile-*/

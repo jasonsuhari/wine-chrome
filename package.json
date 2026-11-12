@@ -6,7 +6,8 @@
     "setup": "npm --prefix engine ci && npm --prefix newtab install && npx playwright-core install chromium",
     "build": "node make.mjs && npm --prefix newtab run build",
     "shots": "node tools/shoot.mjs",
-    "flash": "node tools/flash.mjs"
+    "flash": "node tools/flash.mjs",
+    "check": "node tools/check.mjs"
   },
   "devDependencies": {
     "playwright-core": "^1.65.0"
