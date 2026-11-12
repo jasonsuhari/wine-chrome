@@ -103,7 +103,7 @@ const CASES = {
     return [hsl(c).l > 0.5, fmt(c)];
   },
   'display-p3 stroke stays valid and light'() {
-    const raws = ['.p3-stroke', '.p3-attr'].map((s) => style(s, 'stroke'));
+    const raws = ['.p3-stroke', '.p3-attr', '.p3-built-attr'].map((s) => style(s, 'stroke'));
     return [raws.every((raw) => raw !== 'none' && hsl(rgba(raw)).l > 0.5), raws.join(' | ')];
   },
   'svg mask contents are untouched'() {

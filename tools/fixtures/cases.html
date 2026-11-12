@@ -9,6 +9,8 @@
   --ld-bg: light-dark(#ffffff, #171717);
   --ld-card: light-dark(#dde7f1, #38434f);
   --p3-fg: color(display-p3 .133 .133 .133);
+  --p3-channels: .933 .933 .933;
+  --p3-built: color(display-p3 var(--p3-channels));
   --hairline: #0000001a;
   --x-white: #ffffff;
   --accent: #0b57d0;
@@ -79,7 +81,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 </div>
 <div class="row"><b>svg default fill</b><svg class="default-fill" width="28" height="28" viewBox="0 0 16 16"><path d="M0 0h16v16H0z"/></svg></div>
 <div class="row"><b>svg fill via var</b><svg class="var-fill" width="28" height="28" viewBox="0 0 16 16"><path d="M0 0h16v16H0z"/></svg></div>
-<div class="row"><b>display-p3 stroke</b><svg width="28" height="28" viewBox="0 0 16 16"><path class="p3-stroke" d="M2 2L14 14" stroke-width="3" fill="none"/></svg><svg width="28" height="28" viewBox="0 0 16 16"><path class="p3-attr" stroke="var(--p3-fg)" d="M2 14L14 2" stroke-width="3" fill="none"/></svg></div>
+<div class="row"><b>display-p3 stroke</b><svg width="28" height="28" viewBox="0 0 16 16"><path class="p3-stroke" d="M2 2L14 14" stroke-width="3" fill="none"/></svg><svg width="28" height="28" viewBox="0 0 16 16"><path class="p3-attr" stroke="var(--p3-fg)" d="M2 14L14 2" stroke-width="3" fill="none"/></svg><svg width="28" height="28" viewBox="0 0 16 16"><path class="p3-built-attr" stroke="var(--p3-built)" d="M2 8H14" stroke-width="3" fill="none"/></svg></div>
 <div class="row"><b>svg mask untouched</b>
   <svg width="80" height="28" viewBox="0 0 80 28"><defs><mask id="cut"><rect class="mask-rect" width="80" height="28" fill="white"/><text class="mask-text" x="8" y="19" fill="black" font-size="14">Sign</text></mask></defs><rect width="80" height="28" fill="#635bff" mask="url(#cut)"/></svg>
 </div>

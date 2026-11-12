@@ -26,6 +26,8 @@ const VAR_TYPE_TEXT_COLOR = 1 << 1;
 const VAR_TYPE_BORDER_COLOR = 1 << 2;
 const VAR_TYPE_BG_IMG = 1 << 3;
 
+const colorFunctionStart = /^\s*(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/;
+
 const shouldSetDefaultColor = !location.hostname.startsWith('www.ebay.') && !location.hostname.includes('.ebay.');
 
 export class VariablesStore {
@@ -263,7 +265,7 @@ export class VariablesStore {
         if (rule && rule.selectorText && isFilterCompatibleProp(property)) {
             this.watchFilterVars(sourceValue, rule.selectorText);
         }
-        const isConstructedColor = sourceValue.match(/^\s*(rgb|hsl)a?\(/);
+        const isConstructedColor = sourceValue.match(colorFunctionStart);
         const isSimpleConstructedColor = sourceValue.match(/^rgba?\(var\(--[\-_A-Za-z0-9]+\)(\s*,?\/?\s*0?\.\d+)?\)$/);
         if (isConstructedColor && !isSimpleConstructedColor) {
             const isBg = property.startsWith('background');
@@ -805,7 +807,7 @@ function isVarDependant(value: string) {
 
 function isConstructedColorVar(value: string) {
     return (
-        value.match(/^\s*(rgb|hsl)a?\(/) ||
+        value.match(colorFunctionStart) ||
         value.match(/^(((\d{1,3})|(var\([\-_A-Za-z0-9]+\))),?\s*?){3}$/)
     );
 }
