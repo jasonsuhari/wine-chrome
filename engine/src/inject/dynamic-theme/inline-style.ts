@@ -418,6 +418,10 @@ export function overrideInlineStyle(element: HTMLElement, theme: Theme, ignoreIn
         return;
     }
 
+    if (element instanceof SVGElement && element.closest('mask, clipPath')) {
+        return;
+    }
+
     const cacheKey = getInlineStyleCacheKey(element, theme);
     if (cacheKey === inlineStyleCache.get(element)) {
         return;
