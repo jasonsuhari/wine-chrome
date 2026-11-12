@@ -32,6 +32,14 @@ export const SITES = {
   linear: 'https://linear.app/',
   chatgpt: 'https://chatgpt.com/',
   google: 'https://www.google.com/search?q=burgundy+wine+region&hl=en',
+  twitch: 'https://www.twitch.tv/',
+  ddg: 'https://duckduckgo.com/?q=wine+regions',
+  bing: 'https://www.bing.com/search?q=wine+regions',
+  imdb: 'https://www.imdb.com/',
+  ebay: 'https://www.ebay.com/',
+  cnn: 'https://edition.cnn.com/',
+  arxiv: 'https://arxiv.org/abs/1706.03762',
+  gitlab: 'https://gitlab.com/gitlab-org/gitlab',
 }
 const pick = (process.env.SITES || Object.keys(SITES).join(',')).split(',')
 mkdirSync(OUT, { recursive: true })
