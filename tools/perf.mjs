@@ -4,7 +4,7 @@ import path from 'node:path'
 import { PAGES } from './perf-pages.mjs'
 
 const HERE = path.dirname(new URL(import.meta.url).pathname)
-const EXT = path.resolve(HERE, '../dist/wine')
+const EXT = path.resolve(HERE, process.env.EXT || '../dist/wine')
 const HARS = path.resolve(HERE, 'out/har')
 const exe = process.env.CHROME_PATH || chromium.executablePath()
 const pick = (process.env.PAGES || Object.keys(PAGES).join(',')).split(',')

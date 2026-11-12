@@ -185,21 +185,13 @@ export function iterateShadowHosts(root: Node | null, iterator: (host: Element) 
     if (root == null) {
         return;
     }
-    const walker = document.createTreeWalker(
-        root,
-        NodeFilter.SHOW_ELEMENT,
-        {
-            acceptNode(node) {
-                return (node as Element).shadowRoot == null ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT;
-            },
-        },
-    );
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
     for (
         let node = ((root as Element).shadowRoot ? walker.currentNode : walker.nextNode()) as Element;
         node != null;
         node = walker.nextNode() as Element
     ) {
-        if (node.classList.contains('surfingkeys_hints_host')) {
+        if (node.shadowRoot == null || node.classList.contains('surfingkeys_hints_host')) {
             continue;
         }
 
