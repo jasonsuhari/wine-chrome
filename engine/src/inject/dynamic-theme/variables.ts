@@ -1,6 +1,6 @@
 import type {Theme} from '../../definitions';
 import type {RGBA} from '../../utils/color';
-import {getRGBValues, parseColorWithCache} from '../../utils/color';
+import {getRGBValues, parseColorWithCache, replaceColorLiterals} from '../../utils/color';
 import {getParenthesesRange} from '../../utils/text';
 
 import {iterateCSSRules, iterateCSSDeclarations} from './css-rules';
@@ -698,14 +698,12 @@ function replaceVariablesMatches(input: string, replacer: (match: string, count:
     return parts.join('');
 }
 
-const colorLiteral = /#[0-9a-f]{3,8}\b|\b(?:rgb|hsl)a?\([^()]*\)/gi;
-
 function modifyColorsOutsideVariables(value: string, modify: (color: string) => string): string {
     const matches = getVariablesMatches(value);
     const parts: string[] = [];
     let start = 0;
     for (const m of [...matches, {start: value.length, end: value.length, value: ''}]) {
-        parts.push(value.substring(start, m.start).replace(colorLiteral, modify), m.value);
+        parts.push(replaceColorLiterals(value.substring(start, m.start), modify), m.value);
         start = m.end;
     }
     return parts.join('');

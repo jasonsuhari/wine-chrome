@@ -144,12 +144,14 @@ function modifyLightModeHSL({h, s, l, a}: HSLA, poleFg: HSLA, poleBg: HSLA): HSL
 
 const MAX_BG_LIGHTNESS = 0.4;
 
-function isAccentBlue(h: number, s: number): boolean {
-    return s >= 0.12 && h >= 185 && h <= 265;
-}
+const ACCENT_HUE_SPREAD = 0.08;
 
 function toWineHue(h: number, s: number): number {
-    return isAccentBlue(h, s) ? WINE_ENGINE.accentHue + (h - 225) * 0.15 : h;
+    if (s < 0.12) {
+        return h;
+    }
+    const offset = (h - WINE_ENGINE.accentHue + 540) % 360 - 180;
+    return (WINE_ENGINE.accentHue + offset * ACCENT_HUE_SPREAD + 360) % 360;
 }
 
 function isRedFamily(h: number): boolean {
@@ -209,28 +211,13 @@ function modifyBgHSL({h, s, l, a}: HSLA, pole: HSLA): HSLA {
         return {h: toWineHue(h, s), s, l: lx, a};
     }
 
-    let lx = surfaceLightness(l, pole);
+    const lx = surfaceLightness(l, pole);
 
     if (isNeutral) {
         return wineSurface(lx, pole, a);
     }
 
-    let hx = toWineHue(h, s);
-    const isYellow = hx > 60 && hx < 180;
-    if (isYellow) {
-        const isCloserToGreen = hx > 120;
-        if (isCloserToGreen) {
-            hx = scale(hx, 120, 180, 135, 180);
-        } else {
-            hx = scale(hx, 60, 120, 60, 105);
-        }
-    }
-
-    if (hx > 40 && hx < 80) {
-        lx *= 0.75;
-    }
-
-    return {h: hx, s, l: lx, a};
+    return {h: toWineHue(h, s), s, l: lx, a};
 }
 
 function _modifyBackgroundColor(rgb: RGBA, theme: Theme) {
@@ -276,8 +263,12 @@ function modifyFgHSL(hsl: HSLA, pole: HSLA): HSLA {
     return mapForeground(hsl, pole, clampAccentText);
 }
 
+const VIVID_CHROMA = 0.3;
+const MAX_VIVID_ICON_LIGHTNESS = 0.5;
+
 function modifyIconHSL(hsl: HSLA, pole: HSLA): HSLA {
-    return mapForeground(hsl, pole, (accent) => accent);
+    const isVivid = chroma(hsl.s, hsl.l) > VIVID_CHROMA;
+    return mapForeground(hsl, pole, (accent) => isVivid ? {...accent, l: Math.min(accent.l, MAX_VIVID_ICON_LIGHTNESS)} : accent);
 }
 
 function mapForeground({h, s, l, a}: HSLA, pole: HSLA, finishAccent: (hsl: HSLA) => HSLA): HSLA {

@@ -1,5 +1,5 @@
 import type {Theme} from '../../definitions';
-import {parseColorWithCache, rgbToHSL, hslToString} from '../../utils/color';
+import {parseColorWithCache, replaceColorLiterals, rgbToHSL, hslToString} from '../../utils/color';
 import type {RGBA} from '../../utils/color';
 import type {ParsedGradient} from '../../utils/css-text/parse-gradient';
 import {parseGradient} from '../../utils/css-text/parse-gradient';
@@ -422,6 +422,13 @@ export function checkImageSelectors(node: Element | Document | ShadowRoot): void
     }
 }
 
+function modifyLooseColors(text: string, theme: Theme): string {
+    return replaceColorLiterals(text, (color) => {
+        const rgb = parseColorWithCache(color);
+        return rgb ? modifyBackgroundColor(rgb, theme) : color;
+    });
+}
+
 export function getBgImageModifier(
     value: string,
     rule: CSSStyleRule,
@@ -665,7 +672,7 @@ export function getBgImageModifier(
                         return betweenValue;
                     });
                 } else {
-                    modifiers.push(() => value.substring(prefixStart, matchStart));
+                    modifiers.push((theme) => modifyLooseColors(value.substring(prefixStart, matchStart), theme));
                 }
             }
             prevHasComma = hasComma || false;
@@ -677,7 +684,7 @@ export function getBgImageModifier(
             }
 
             if (i === matches.length - 1) {
-                modifiers.push(() => value.substring(matchEnd));
+                modifiers.push((theme) => modifyLooseColors(value.substring(matchEnd), theme));
             }
         });
 

@@ -706,3 +706,9 @@ function domParseColor($color: string) {
     const color = `rgba(${d[0]}, ${d[1]}, ${d[2]}, ${(d[3] / 255).toFixed(2)})`;
     return parseRGB(color);
 }
+
+const colorLiteralRegex = /#[0-9a-f]{3,8}\b|\b(?:rgb|hsl)a?\([^()]*\)/gi;
+
+export function replaceColorLiterals(text: string, modify: (color: string) => string): string {
+    return text.replace(colorLiteralRegex, modify);
+}

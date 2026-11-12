@@ -40,12 +40,12 @@ const CASES = {
     const cs = ['.oklch-bg', '.oklch-var-bg', '.oklch-from-var'].map((s) => color(s, 'background-color'));
     return [cs.every((c) => hsl(c).l < 0.3 && isWineHue(c)), cs.map(fmt).join(' ')];
   },
-  'hsl() with calc() keeps its hue'() {
+  'hsl() with calc() is read and turned wine'() {
     const c = color('.calc-hsl', 'color');
     const bg = color('.calc-hsl-var', 'background-color');
     const {h} = hsl(c);
     const bgHsl = hsl(bg);
-    return [h >= 5 && h <= 60 && ((bgHsl.h >= 5 && bgHsl.h <= 60) || isWineHue(bg)) && bgHsl.l < 0.35, `${fmt(c)} h=${h.toFixed(0)} bg=${fmt(bg)} h=${bgHsl.h.toFixed(0)}`];
+    return [isWineHue(c) && isWineHue(bg) && bgHsl.l < 0.35, `${fmt(c)} h=${h.toFixed(0)} bg=${fmt(bg)} h=${bgHsl.h.toFixed(0)}`];
   },
   'light-dark() surfaces become wine'() {
     const cs = ['.ld-bg', '.ld-card'].map((s) => color(s, 'background-color'));

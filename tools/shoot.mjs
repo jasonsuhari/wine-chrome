@@ -40,6 +40,8 @@ export const SITES = {
   cnn: 'https://edition.cnn.com/',
   arxiv: 'https://arxiv.org/abs/1706.03762',
   gitlab: 'https://gitlab.com/gitlab-org/gitlab',
+  whatsapp: 'https://www.whatsapp.com/',
+  ghissues: 'https://github.com/darkreader/darkreader/pulls?q=is%3Apr',
 }
 const pick = (process.env.SITES || Object.keys(SITES).join(',')).split(',')
 mkdirSync(OUT, { recursive: true })
