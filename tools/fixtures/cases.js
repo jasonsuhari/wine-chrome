@@ -75,9 +75,8 @@ const CASES = {
     return [border.a < 0.6 && dist(border, text) > 1 && bg.a === 1 && hsl(bg).l < 0.3, `border=${fmt(border)} bg=${fmt(bg)} text=${fmt(text)}`];
   },
   'background var holding colour and image keeps both'() {
-    const img = style('.btn-shorthand', 'background-image');
-    const c = color('.btn-shorthand', 'background-color');
-    return [img !== 'none' && hsl(c).s > 0.4, `${fmt(c)} image=${img.slice(0, 30)}`];
+    const results = ['.btn-shorthand', '.btn-imported'].map((s) => [style(s, 'background-image'), color(s, 'background-color')]);
+    return [results.every(([img, c]) => img !== 'none' && hsl(c).s > 0.4), results.map(([img, c]) => `${fmt(c)} image=${img.slice(0, 30)}`).join(' | ')];
   },
   'mask icon keeps a visible colour'() {
     const c = color('.mask-icon', 'background-color');

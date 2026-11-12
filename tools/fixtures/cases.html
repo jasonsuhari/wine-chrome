@@ -80,7 +80,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 <div class="row link-nested"><b>link via nested var()</b><a href="#x">a link</a></div>
 <div class="row"><b>translucent hairline border</b><div class="box hairline"></div><div class="box hairline-logical"></div></div>
 <div class="row"><b>light-dark toggle vars</b><div class="box toggle-border"></div><div class="box toggle-bg"></div></div>
-<div class="row"><b>background var with image</b><div class="box btn-shorthand"></div></div>
+<div class="row"><b>background var with image</b><div class="box btn-shorthand"></div><div class="box btn-imported"></div></div>
 <div class="row"><b>mask icon keeps colour</b><div class="box mask-icon" style="width:28px"></div></div>
 <div class="row"><b>gradient text stays light</b><span class="grad-text">PROLED</span></div>
 <div class="row"><b>css-in-js dark button</b><button class="cssinjs-btn">Got it</button><button class="cssinjs-reset-btn">Reset</button></div>
@@ -102,6 +102,7 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 <div class="row"><b>translucent input on panel</b><div class="panel"><input placeholder="Email"></div></div>
 <div class="row"><b>unstyled input</b><input class="plain-input" value="search"></div>
 
+<style>@import url("data:text/css,.btn-imported%7Bbackground:var(--btn);background-size:8px%7D");</style>
 <script>
 customElements.define('wine-time', class extends HTMLElement {
   connectedCallback() {
