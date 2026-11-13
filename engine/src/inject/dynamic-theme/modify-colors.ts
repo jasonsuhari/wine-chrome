@@ -311,8 +311,13 @@ export function modifyIconColor(rgb: RGBA, theme: Theme): string {
     return modifyColorWithCache(rgb, theme, modifyIconHSL, getFgPole(theme));
 }
 
+const PAGE_WHITE_LIGHTNESS = 0.96;
+
 function modifyBorderHSL({h, s, l, a}: HSLA, _poleFg: HSLA, poleBg: HSLA): HSLA {
     const isNeutral = l < 0.2 || s < 0.24;
+    if (isNeutral && l >= PAGE_WHITE_LIGHTNESS) {
+        return modifyBgHSL({h, s, l, a}, poleBg);
+    }
     if (isNeutral) {
         return {h: poleBg.h, s: WINE_ENGINE.borderSaturation, l: scale(l, 0, 1, 0.32, 0.14), a};
     }

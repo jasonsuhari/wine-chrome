@@ -140,6 +140,15 @@ const CASES = {
     const delta = Math.abs(hsl(mixed).l - hsl(panel).l);
     return [delta > 0.025, `panel=${fmt(panel)} input=${fmt(input)} delta l=${delta.toFixed(3)}`];
   },
+  'outline drawn in the row colour matches the row'() {
+    const row = color('.chat-row', 'background-color');
+    const outline = color('.chat-bubble', 'outline-color');
+    return [dist(row, outline) < 4, `row=${fmt(row)} outline=${fmt(outline)}`];
+  },
+  'variable defined for an unused theme keeps the value in use'() {
+    const c = color('.themed-row', 'background-color');
+    return [dist(c, WINE_BASE) < 4, fmt(c)];
+  },
   'unstyled input is wine'() {
     const c = color('.plain-input', 'background-color');
     return [isWineHue(c) && hsl(c).c > 0.02 && hsl(c).l < 0.3, fmt(c)];

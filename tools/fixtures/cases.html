@@ -71,6 +71,12 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 [data-never] { --glass: rgba(15, 15, 15, .8); }
 .glass-reset { --glass: unset; }
 .glass { background: var(--glass); }
+
+:root { --row-bg: #ffffff; --surface: 255, 255, 255; }
+.theme-not-applied { --surface: 12, 16, 20; }
+.themed-row { background-color: var(--themed-row-bg); padding: 12px; }
+.chat-row { background: var(--row-bg); padding: 12px; }
+.chat-bubble { display: inline-block; padding: 8px 12px; background: #f3f5f7; border-radius: 18px; outline: 10px solid var(--row-bg); }
 </style>
 </head>
 <body>
@@ -108,6 +114,8 @@ body { margin: 0; padding: 16px; background: #fff; color: #1f2328; font: 14px/1.
 <div class="row"><b>shadow root text</b><wine-time></wine-time></div>
 <div class="row"><b>inline important colour</b><span class="inline-important" style="color: #000080 !important">navy inline</span></div>
 <div class="row"><b>translucent input on panel</b><div class="panel"><input placeholder="Email"></div></div>
+<div class="row"><b>outline in the row colour</b><div class="chat-row"><span class="chat-bubble">Elon</span></div></div>
+<div class="row"><b>variable with a second theme</b><div class="themed-row" style="--themed-row-bg: rgb(var(--surface))">row</div></div>
 <div class="row"><b>unstyled input</b><input class="plain-input" value="search"></div>
 
 <style>@import url("data:text/css,.btn-imported%7Bbackground:var(--btn);background-size:8px%7D");</style>

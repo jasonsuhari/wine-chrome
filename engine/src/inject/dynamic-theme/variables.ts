@@ -46,6 +46,8 @@ export class VariablesStore {
     private changedTypeVars = new Set<string>();
     private typeChangeSubscriptions = new Map<string, Set<() => void>>();
     private unstableVarValues = new Map<string, string>();
+    private rootVarValues = new Map<string, string>();
+    private varValuesInEffect: VarValues = {get: (name) => this.rootVarValue(name) || this.unstableVarValues.get(name)};
     private varFilterTypes = new Map<string, FilterType>();
     private notifyingVarFilterTypes = new Set<string>();
     private varsChanged = false;
@@ -65,8 +67,21 @@ export class VariablesStore {
         this.changedTypeVars.clear();
         this.typeChangeSubscriptions.clear();
         this.unstableVarValues.clear();
+        this.rootVarValues.clear();
         this.varFilterTypes.clear();
         this.notifyingVarFilterTypes.clear();
+    }
+
+    /** The page may define a variable for several themes; the root's computed value is the one it uses now. */
+    private rootVarValue(name: string): string | undefined {
+        let value = this.rootVarValues.get(name);
+        if (value === undefined) {
+            value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+            if (value) {
+                this.rootVarValues.set(name, value);
+            }
+        }
+        return value || undefined;
     }
 
     private isVarType(varName: string, typeNum: number) {
@@ -181,7 +196,7 @@ export class VariablesStore {
                     let modifiedValue: string;
                     if (isVarDependant(sourceValue)) {
                         if (isConstructedColorVar(sourceValue)) {
-                            let value = insertVarValues(sourceValue, this.unstableVarValues);
+                            let value = insertVarValues(sourceValue, this.varValuesInEffect);
                             if (!value) {
                                 value = typeNum === VAR_TYPE_BG_COLOR ? '#ffffff' : '#000000';
                             }
@@ -273,7 +288,7 @@ export class VariablesStore {
             const isBg = property.startsWith('background');
             const isText = isTextColorProperty(property);
             return (theme) => {
-                let value = insertVarValues(sourceValue, this.unstableVarValues);
+                let value = insertVarValues(sourceValue, this.varValuesInEffect);
                 if (!value) {
                     value = isBg ? '#ffffff' : '#000000';
                 }
@@ -461,6 +476,7 @@ export class VariablesStore {
 
     private inspectVariable(varName: string, value: string) {
         this.unstableVarValues.set(varName, value);
+        this.rootVarValues.delete(varName);
         if (cssWideKeywords.has(value.trim().toLowerCase())) {
             return;
         }
@@ -890,7 +906,11 @@ function tryModifyBorderColor(color: string, theme: Theme) {
 const MAX_VARIABLE_SUBSTITUTIONS = 100000;
 const MAX_VARIABLE_DEPTH = 1000;
 
-function insertVarValues(source: string, varValues: Map<string, string>, stack = new Set<string>(), cache = new Map<string, string | null>(), depth = 0) {
+interface VarValues {
+    get(name: string): string | undefined;
+}
+
+function insertVarValues(source: string, varValues: VarValues, stack = new Set<string>(), cache = new Map<string, string | null>(), depth = 0) {
     if (depth > MAX_VARIABLE_DEPTH) {
         return null;
     }
